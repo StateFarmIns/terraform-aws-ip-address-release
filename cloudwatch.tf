@@ -1,6 +1,6 @@
 # This file contains the Cloudwatch alarms that attach to the timer service alarm lambda.
 resource "aws_cloudwatch_event_rule" "ip_address_release_lambda_interval" {
-  name                = "${var.usecase}-ip-address-lambda-release-rule"
+  name                = "${var.prefix}-ip-address-lambda-release-rule"
   description         = "Fires every 24 hours"
   schedule_expression = "rate(24 hours)"
 }

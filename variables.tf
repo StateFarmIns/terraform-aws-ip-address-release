@@ -3,9 +3,9 @@ variable "account_name" {
   description = "The account name for use in alarm description."
 }
 
-variable "usecase" {
+variable "prefix" {
   type        = string
-  description = "Usecase name, can be a team or product name. E.g., 'SRE'"
+  description = "prefix name, can be a team or product name. E.g., 'SRE'"
 }
 
 variable "timeout" {

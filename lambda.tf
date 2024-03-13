@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "ip_address_release_lambda" {
   filename         = data.archive_file.lambda_source.output_path
-  function_name    = "${var.usecase}-ip-address-release-lambda"
+  function_name    = "${var.prefix}-ip-address-release-lambda"
   role             = var.iam_role_arn == null ? module.iam[0].role_arn : var.iam_role_arn
   handler          = "lambda_function.lambda_handler"
   source_code_hash = filebase64sha256(data.archive_file.lambda_source.output_path)
@@ -10,7 +10,7 @@ resource "aws_lambda_function" "ip_address_release_lambda" {
 
   environment {
     variables = {
-      USECASE = var.usecase
+      prefix = var.prefix
     }
   }
 
