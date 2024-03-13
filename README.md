@@ -52,7 +52,7 @@ This includes a 24 hour cloudwatch alarm to trigger the lambda regularly in an e
 | <a name="input_permissions_boundary_arn"></a> [permissions\_boundary\_arn](#input\_permissions\_boundary\_arn)                     | The ARN of the policy that is used to set the permissions boundary for the IAM roles.                       | `string`       | `null`  |    no    |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids)                                                                 | Subnets that Lambda will be created with in the VPC                                                         | `list(string)` | `[]`    |    no    |
 | <a name="input_timeout"></a> [timeout](#input\_timeout)                                                                            | Timeout value for the lambda                                                                                | `number`       | `300`   |    no    |
-| <a name="input_usecase"></a> [usecase](#input\_usecase)                                                                            | Usecase name, can be a team or product name. E.g., 'SRE'                                                    | `string`       | n/a     |   yes    |
+| <a name="input_prefix"></a> [prefix](#input\_prefix)                                                                               | prefix name, can be a team or product name. E.g., 'SRE'                                                     | `string`       | n/a     |   yes    |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id)                                                                             | VPC ID to attach the IP Address Release lambda to. Only necessary if there are multiple VPCs in an account. | `string`       | `null`  |    no    |
 
 ## Outputs
@@ -73,7 +73,7 @@ module "ip-address-release-primary" {
     aws = aws
   }
 
-  usecase                           = "SRE"
+  prefix                           = "SRE"
   account_name                      = var.account_name
   permissions_boundary_arn          = local.permissions_boundary
   internet_egress_security_group_id = data.aws_security_group.https-internet-egress.id
@@ -88,7 +88,7 @@ module "ip-address-release-secondary" {
     aws = aws.secondary
   }
 
-  usecase                           = "SRE"
+  prefix                           = "SRE"
   account_name                      = var.account_name
   permissions_boundary_arn          = local.permissions_boundary
   internet_egress_security_group_id = data.aws_security_group.https-internet-egress_secondary.id
