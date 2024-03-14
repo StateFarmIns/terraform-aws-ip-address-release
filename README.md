@@ -7,8 +7,58 @@ An exception is made for ENIs attached to DataSync tasks since DataSync only est
 This includes a 24 hour cloudwatch alarm to trigger the lambda regularly in an effort to keep the account clean and make the resources available for another consumer.
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
 
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14 |
+| <a name="requirement_archive"></a> [archive](#requirement\_archive) | ~> 2.2 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | > 4.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1.0 |
 
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_archive"></a> [archive](#provider\_archive) | ~> 2.2 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | > 4.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_iam"></a> [iam](#module\_iam) | ./iam | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_cloudwatch_event_rule.ip_address_release_lambda_interval](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_target.ip_address_release_lambda_attach](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
+| [aws_lambda_function.ip_address_release_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
+| [aws_lambda_permission.event_permission](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
+| [archive_file.lambda_source](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_account_name"></a> [account\_name](#input\_account\_name) | The account name for use in alarm description. | `string` | n/a | yes |
+| <a name="input_iam_role_arn"></a> [iam\_role\_arn](#input\_iam\_role\_arn) | The ARN of the IAM Role to use (creates a new one if set to `null`) | `string` | `null` | no |
+| <a name="input_internet_egress_security_group_id"></a> [internet\_egress\_security\_group\_id](#input\_internet\_egress\_security\_group\_id) | security group id that allows internet outbound calls to port 443 | `string` | n/a | yes |
+| <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | ARN of the key to give to Lambda for access | `string` | n/a | yes |
+| <a name="input_lambda_runtime"></a> [lambda\_runtime](#input\_lambda\_runtime) | Python runtime to use for this lambda | `string` | `"python3.9"` | no |
+| <a name="input_permissions_boundary_arn"></a> [permissions\_boundary\_arn](#input\_permissions\_boundary\_arn) | The ARN of the policy that is used to set the permissions boundary for the IAM roles. | `string` | `null` | no |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | prefix name, can be a team or product name. E.g., 'SRE' | `string` | n/a | yes |
+| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | Subnets that Lambda will be created with in the VPC | `list(string)` | n/a | yes |
+| <a name="input_timeout"></a> [timeout](#input\_timeout) | Timeout value for the lambda | `number` | `300` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID to attach the IP Address Release lambda to. | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_iam_role_arn"></a> [iam\_role\_arn](#output\_iam\_role\_arn) | The IAM Role created, or the one passed in. |
 <!-- END_TF_DOCS -->
 
 # Multi-region deployment
