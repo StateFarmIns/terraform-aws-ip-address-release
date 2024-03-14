@@ -7,59 +7,8 @@ An exception is made for ENIs attached to DataSync tasks since DataSync only est
 This includes a 24 hour cloudwatch alarm to trigger the lambda regularly in an effort to keep the account clean and make the resources available for another consumer.
 
 <!-- BEGIN_TF_DOCS -->
-## Requirements
 
-| Name                                                                      | Version  |
-| ------------------------------------------------------------------------- | -------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14  |
-| <a name="requirement_archive"></a> [archive](#requirement\_archive)       | ~> 2.2   |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws)                   | > 4.0    |
-| <a name="requirement_random"></a> [random](#requirement\_random)          | >= 3.1.0 |
 
-## Providers
-
-| Name                                                          | Version |
-| ------------------------------------------------------------- | ------- |
-| <a name="provider_archive"></a> [archive](#provider\_archive) | ~> 2.2  |
-| <a name="provider_aws"></a> [aws](#provider\_aws)             | > 4.0   |
-
-## Modules
-
-| Name                                          | Source | Version |
-| --------------------------------------------- | ------ | ------- |
-| <a name="module_iam"></a> [iam](#module\_iam) | ./iam  | n/a     |
-
-## Resources
-
-| Name                                                                                                                                                                | Type        |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [aws_cloudwatch_event_rule.ip_address_release_lambda_interval](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule)   | resource    |
-| [aws_cloudwatch_event_target.ip_address_release_lambda_attach](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource    |
-| [aws_lambda_function.ip_address_release_lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function)                        | resource    |
-| [aws_lambda_permission.event_permission](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission)                             | resource    |
-| [archive_file.lambda_source](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file)                                               | data source |
-| [aws_security_group.https-internet-egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/security_group)                           | data source |
-| [aws_vpc.internal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc)                                                              | data source |
-
-## Inputs
-
-| Name                                                                                                                               | Description                                                                                                 | Type           | Default | Required |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------- | ------- | :------: |
-| <a name="input_account_name"></a> [account\_name](#input\_account\_name)                                                           | The account name for use in alarm description.                                                              | `string`       | n/a     |   yes    |
-| <a name="input_create_iam_role"></a> [create\_iam\_role](#input\_create\_iam\_role)                                                | Pass in `false` if you are supplying an IAM role.                                                           | `bool`         | `true`  |    no    |
-| <a name="input_iam_role_arn"></a> [iam\_role\_arn](#input\_iam\_role\_arn)                                                         | The ARN of the IAM Role to use (creates a new one if set to `null`)                                         | `string`       | `null`  |    no    |
-| <a name="input_internet_egress_security_group"></a> [internet\_egress\_security\_group](#input\_internet\_egress\_security\_group) | Name of a security group that allows internet outbound calls to port 443                                    | `string`       | n/a     |   yes    |
-| <a name="input_permissions_boundary_arn"></a> [permissions\_boundary\_arn](#input\_permissions\_boundary\_arn)                     | The ARN of the policy that is used to set the permissions boundary for the IAM roles.                       | `string`       | `null`  |    no    |
-| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids)                                                                 | Subnets that Lambda will be created with in the VPC                                                         | `list(string)` | `[]`    |    no    |
-| <a name="input_timeout"></a> [timeout](#input\_timeout)                                                                            | Timeout value for the lambda                                                                                | `number`       | `300`   |    no    |
-| <a name="input_prefix"></a> [prefix](#input\_prefix)                                                                               | prefix name, can be a team or product name. E.g., 'SRE'                                                     | `string`       | n/a     |   yes    |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id)                                                                             | VPC ID to attach the IP Address Release lambda to. Only necessary if there are multiple VPCs in an account. | `string`       | `null`  |    no    |
-
-## Outputs
-
-| Name                                                                         | Description                                 |
-| ---------------------------------------------------------------------------- | ------------------------------------------- |
-| <a name="output_iam_role_arn"></a> [iam\_role\_arn](#output\_iam\_role\_arn) | The IAM Role created, or the one passed in. |
 <!-- END_TF_DOCS -->
 
 # Multi-region deployment
@@ -76,8 +25,11 @@ module "ip-address-release-primary" {
   prefix                           = "SRE"
   account_name                      = var.account_name
   permissions_boundary_arn          = local.permissions_boundary
-  internet_egress_security_group_id = data.aws_security_group.https-internet-egress.id
-  vpc_id                            = data.aws_vpc.internal.id
+  internet_egress_security_group_id = data.aws_security_group.https-internet-egress_primary.id
+  vpc_id                            = data.aws_vpc.internal_primary.id
+  subnet_ids                        = data.aws_subnets.private_subnets_primary.ids
+  kms_key_arn                       = data.aws_kms_key.master_primary.arn
+
 }
 
 * assumes an aliased (secondary) provider is setup elsewhere
@@ -94,6 +46,8 @@ module "ip-address-release-secondary" {
   internet_egress_security_group_id = data.aws_security_group.https-internet-egress_secondary.id
   iam_role_arn                      = module.ip-address-release-primary.iam_role_arn # reference the IAM Role created earlier
   vpc_id                            = data.aws_vpc.internal_secondary.id
+  subnet_ids                        = data.aws_subnets.private_subnets_secondary.ids
+  kms_key_arn                       = data.aws_kms_key.master_secondary.arn
 }
 ```
 

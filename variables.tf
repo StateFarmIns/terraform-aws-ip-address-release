@@ -45,5 +45,9 @@ variable "vpc_id" {
 variable "subnet_ids" {
   type        = list(string)
   description = "Subnets that Lambda will be created with in the VPC"
-  default     = []
+}
+
+variable "kms_key_arn" {
+  type        = string
+  description = "ARN of the key to give to Lambda for access"
 }
