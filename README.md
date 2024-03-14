@@ -54,5 +54,5 @@ module "ip-address-release-secondary" {
 # Links
 * [Why can't I detach or delete an elastic network interface that Lambda created?](https://aws.amazon.com/premiumsupport/knowledge-center/lambda-eni-find-delete/)
 * [Requester Managed Network Interfaces](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/requester-managed-eni.html)
-* findassociations script copied from [AWS-support-tools](https://github.com/awslabs/aws-support-tools)
+* findassociations script in [AWS-support-tools](https://github.com/awslabs/aws-support-tools) can help track down why an ENI is stuck
 
