@@ -5,4 +5,5 @@ module "iam" {
   prefix                   = var.prefix
   account_name             = var.account_name
   permissions_boundary_arn = var.permissions_boundary_arn
+  kms_key_arn              = var.kms_key_arn
 }
