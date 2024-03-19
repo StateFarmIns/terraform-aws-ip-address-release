@@ -1,3 +1,12 @@
 {
-   "signedContributors": []
+  "signedContributors": [
+    {
+      "name": "lyonsden",
+      "id": 705541,
+      "comment_id": 2007657494,
+      "created_at": "2024-03-19T16:42:15Z",
+      "repoId": 760628592,
+      "pullRequestNo": 7
+    }
+  ]
 }
